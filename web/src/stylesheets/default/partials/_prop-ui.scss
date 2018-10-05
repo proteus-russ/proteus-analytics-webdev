@@ -1,0 +1,590 @@
+@import "../config/base-vars";
+@import "../mixins/miwt-switch";
+@import "../../../../../node_modules/bootstrap/scss/mixins/buttons";
+
+/* ==========================================================================
+   Basic Styles for Property Editor/Viewer
+   baiken@vipasolutions.com, sbenes, djacobi
+   Updated June 23, 2017
+   ========================================================================== */
+
+%maxWidth {
+	width: 100%;
+	max-width: 65rem;
+	margin: 0 auto;
+}
+
+/* Form Elements
+   ========================================================================== */
+
+.prop-wrapper {
+	//max-width: 50rem;
+	//max-width: 100%;
+
+	input,
+	textarea {
+		border: 1px solid #aaa;
+		padding: 6px 8px 5px;
+		font-size: 1rem;
+		line-height: 1.15;
+	}
+
+	input:focus,
+	select:focus,
+	textarea:focus {
+		background-color: #feffdd;
+	}
+
+	button,
+	input[type="submit"],
+	input[type="reset"],
+	.constraints a[data-features~="submit"] {
+		text-transform: uppercase;
+		text-decoration: none;
+		white-space: nowrap;
+	}
+
+}
+
+input[type=number] {
+	width: 8ch;
+}
+
+/* Content
+	 ========================================================================== */
+.prop-wrapper {
+	.prop-header-title {
+		font-size: 22px;
+		font-weight: 500;
+		margin: 1em 0;
+	}
+
+	.prop-group-title {
+		font-weight: 500;
+		font-size: 18px;
+		margin: 10px 0;
+	}
+	span.ctb {
+		display: block;
+
+		&.label-before {
+			label {
+				margin-right: 6px;
+			}
+		}
+
+		&.label-after {
+			label {
+				margin-left: 6px;
+			}
+		}
+	}
+
+	.prop > label {
+		display: block;
+		font-weight: 500;
+		user-select: none;
+		margin-bottom: .125rem;
+
+		&::after {
+			content: ':';
+			padding-left: 1px;
+			display: inline-block;
+		}
+	}
+	.prop > label.tbl {
+		display: inline-block;
+		padding-right: 4px;
+	}
+
+	.prop > .val,
+	.prop .localizable .val {
+		display: inline-block;
+		font-weight: 300;
+	}
+
+	header .actions, footer .actions {
+		margin: 10px 0;
+		text-align: right;
+	}
+
+	.actions.bottom {
+		text-align: left;
+	}
+
+	.prop {
+		margin-bottom: 1rem;
+		padding: 5px;
+		font-weight: 300;
+		> .actions, .selected-link {
+			.btn {
+				@include button-size-legacy($btn-padding-y-sm, $btn-padding-x-sm, $font-size-xs, $btn-size-line-height, $btn-border-radius-sm);
+			}
+		}
+	}
+	.prop-group {
+		margin-bottom: 0;
+	}
+
+	.user-entry-required label:after,
+	.user-entry-required caption:after {
+		content: "*";
+		color: #ff0000;
+	}
+
+	.validation-error input[type="text"] {
+		border: 1px solid red;
+	}
+
+}
+
+.prop-viewer,
+.prop-editor {
+	padding: 1rem;
+	@extend %maxWidth;
+}
+
+.prop-viewer {
+	.actions.top {
+		display: none;
+	}
+
+	.address > span {
+		display: block;
+		font-weight: 300;
+	}
+
+}
+
+.location-view {
+	.prop-body {
+		background-color: $color-white;
+		border: 1px solid $color-lighter-grey;
+		padding: 1rem;
+	}
+}
+
+.company-editor, .company-viewer,
+.client-editor, .client-viewer {
+
+	.prop-body > div {
+		display: flex;
+		flex-flow: column nowrap;
+
+		@include media-breakpoint-up(md) {
+			flex-flow: row nowrap;
+		}
+	}
+}
+
+.prop-column.left {
+	flex: 1 0 100%;
+	max-width: 100%;
+
+	@include media-breakpoint-up(md) {
+		flex: 1 0 35%;
+		max-width: 35%;
+	}
+}
+
+.prop-column.right {
+	flex: 1 0 100%;
+	margin-left: 0;
+	padding-left: 0;
+
+	@include media-breakpoint-up(md) {
+		flex: 1 0 62%;
+		margin-left: 1.5rem;
+		padding-left: 1.75rem;
+		border-left: 1px solid $color-lighter-grey;
+	}
+
+	.row {
+		display: flex;
+		flex-direction: row;
+		flex-wrap: wrap;
+		justify-content: flex-start;
+
+		@include media-breakpoint-up(md) {
+			flex-wrap: nowrap;
+		}
+
+		.prop-group {
+			width: 100%;
+		}
+
+		.prop-group.address {
+			display: flex;
+			flex-direction: row;
+			flex-wrap: wrap;
+			justify-content: flex-start;
+
+			.address-line-1,
+			.address-line-2 {
+				flex: 1 0 50%;
+			}
+
+			.city,
+			.state,
+			.postal-code {
+				flex: 1 0 33%;
+			}
+		}
+
+		.prop-group.email-address,
+		.prop-group.phone {
+			.client-editor & {
+				flex: 1 0 50%;
+			}
+		}
+
+		.prop {
+			@include media-breakpoint-down(sm) {
+				width: 100%;
+			}
+
+			input {
+				width: 100%;
+			}
+
+			&.name, &.website {
+				flex: 1 0 auto;
+				max-width: 100%;
+			}
+
+			&.phone {
+
+				.company-editor & {
+					flex: 1 0 33%;
+				}
+			}
+		}
+	}
+}
+
+.company-viewer {
+
+	.prop-column.left {
+		flex: 1 0 100%;
+		max-width: 100%;
+
+		@include media-breakpoint-up(md) {
+			flex: 1 0 35%;
+			max-width: 35%;
+		}
+
+		.prop {
+			text-align: center;
+
+			label {
+				text-align: left;
+			}
+		}
+	}
+
+	.prop-column.right {
+		.row > .prop {
+			flex: 1 0 100%;
+
+			@include media-breakpoint-up(md) {
+				flex: 1 0 33%;
+			}
+		}
+	}
+}
+
+.company-editor {
+	.prop.subdomain {
+		display: flex;
+		flex-flow: row wrap;
+		justify-content: flex-start;
+
+		label, .instructions-wrapper {
+			flex: 1 0 100%;
+			width: 100%;
+		}
+
+		input.val {
+			flex: 1 0 auto;
+			width: auto;
+		}
+
+		.super-domain-name {
+			flex: 0 1 auto;
+			padding-left: 2px;
+		}
+	}
+}
+
+.client-viewer {
+	.prop-column.right {
+		.row > .prop {
+			flex: 1 0 50%;
+		}
+	}
+}
+
+.location-view {
+
+	.row {
+		width: 100%;
+		display: flex;
+		flex-flow: row wrap;
+
+		.prop {
+			flex: 1 0 100%;
+
+			@include media-breakpoint-up(md) {
+				flex: 1 0 33%;
+			}
+		}
+	}
+}
+
+.location-editor {
+
+	.row {
+		width: 100%;
+		display: flex;
+		flex-flow: row wrap;
+
+		.prop {
+			input[type="text"],
+			input[type="email"],
+			input[type="tel"] {
+				width: 100%;
+			}
+		}
+
+		.prop-group.address {
+			width: 100%;
+			display: flex;
+			flex-direction: row;
+			flex-wrap: wrap;
+			justify-content: flex-start;
+
+			.address-line-1,
+			.address-line-2 {
+				flex: 1 0 50%;
+			}
+
+			.city,
+			.state,
+			.postal-code {
+				flex: 1 0 33%;
+
+				span.select2-container {
+					width: 100% !important;
+				}
+			}
+		}
+
+		.prop.name,
+		.prop-group.email-address,
+		.prop-group.phone {
+			flex: 1 0 50%;
+		}
+	}
+}
+
+.miwt.company-viewer {
+	@extend %maxWidth;
+}
+
+.miwt.user-viewer {
+	@extend %maxWidth;
+
+	.row {
+		display: flex;
+		flex-flow: row nowrap;
+
+		&:not(.user-con) {
+			.column {
+				width: 100%;
+				display: flex;
+				flex-flow: row nowrap;
+
+				.prop:not(.notification-pref) {
+					flex: 1 0 auto;
+					max-width: 30%;
+				}
+			}
+		}
+	}
+
+	.row.user-con {
+
+		.column .row {
+			width: 100%;
+			display: flex;
+			flex-flow: row nowrap;
+			justify-content: flex-start;
+
+			.prop {
+				flex: 1 0 auto;
+				max-width: 43%;
+			}
+		}
+
+		.left {
+			flex: 1 0 auto;
+			max-width: 30%;
+		}
+
+		.right {
+			flex: 1 0 auto;
+			max-width: 75%;
+			display: flex;
+			flex-flow: row wrap;
+		}
+	}
+}
+
+.prop-editor {
+	background-color: $color-white;
+	border: 1px solid $color-lighter-grey;
+
+	.prop {
+		input[type=text],
+		input[type=email],
+		input[type=url],
+		input[type=tel],
+		textarea {
+			//min-width: 25rem;
+			width: 45%;
+		}
+
+		.actions {
+			@include button-size-legacy($btn-padding-y-sm, $btn-padding-x-sm, $font-size-sm, $btn-size-line-height, $btn-border-radius-sm);
+		}
+		span.rtb + span.rtb {
+			padding-left: 1rem;
+		}
+		span.ctb + span.ctb {
+			padding-left: 1rem;
+		}
+	}
+
+	.miwt-calendar {
+		input[type=text] {
+			min-width: 8rem;
+			max-width: 8rem;
+		}
+	}
+
+	div.window.dialog & {
+		border: none;
+	}
+}
+
+@media (max-width: 767px) {
+	.prop-editor {
+		.prop {
+			input[type=text],
+			input[type=email],
+			input[type=url],
+			input[type=tel],
+			textarea {
+				width: 100%;
+			}
+		}
+	}
+}
+
+.prop.schedule {
+	width: 100%;
+	margin-top: 1rem;
+
+	> div {
+		width: 8rem;
+		.select2-container {
+			max-width: 100%;
+			width: 100% !important;
+		}
+
+		&.repeat-interval-wrapper {
+			display: inline-block;
+			margin: 2rem 1rem 0 0;
+			+ .frequency {
+				display: inline-block;
+				vertical-align: top;
+				margin: 2rem 0 1rem;
+				padding: 0;
+
+				> label {
+					display: block;
+					color: transparent;
+				}
+			}
+		}
+		&.by, &.dom {
+			padding: 0;
+			margin-bottom: 1rem;
+		}
+	}
+	.prop.dow {
+		span.ctb + span.ctb {
+			padding-left: 0;
+		}
+	}
+	.prop.repeat {
+		display: inline-block;
+		margin: 0;
+		padding: 0;
+		@include checkboxSwitch(false, 6ch);
+		width: 100%;
+	}
+
+	span.rtb.label-after {
+		display: block;
+
+		+ span.rtb.label-after {
+			padding-left: 0;
+		}
+	}
+
+}
+
+/* PICTURE EDITOR
+	 ========================================================================== */
+.user-picture.mode-view {
+	max-width: 325px;
+	box-sizing: content-box;
+	img {
+		max-width: 325px;
+	}
+}
+
+.resource-picture.mode-view {
+	max-width: 350px;
+	box-sizing: content-box;
+}
+
+.picture-editor {
+
+	.actions.bottom {
+		text-align: center;
+
+		.btn {
+			text-transform: none;
+			@include button-size-legacy($btn-padding-y-sm, $btn-padding-x-sm, $font-size-sm, $btn-size-line-height, $btn-border-radius-sm);
+		}
+	}
+
+	&.mode-crop {
+
+		.actions.bottom {
+			margin-top: .5rem;
+			text-align: right;
+			border-top: 1px solid $color-lighter-grey;
+			padding-top: 1rem;
+		}
+	}
+}
+
+.prop.picture {
+	img {
+		border-radius: 100%;
+		max-height: 200px;
+	}
+}

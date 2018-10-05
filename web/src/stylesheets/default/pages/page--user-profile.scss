@@ -1,0 +1,133 @@
+@import "../config/base-vars";
+@import "../../../../../node_modules/bootstrap/scss/mixins";
+
+#main-content {
+	min-height: calc(100vh - 155px);
+}
+
+.my-account-view {
+	max-width: 90%;
+	background: #fff;
+	border: 1px solid lighten($color-app-light-grey, 25%);
+	border-radius: $border-radius-lg;
+	margin: 7rem auto 0;
+	padding: 2rem;
+
+	@include media-breakpoint-up(md) {
+		width: 100%;
+		max-width: 600px;
+	}
+
+	.prop {
+		display: block;
+		width: 100%;
+
+		&.picture {
+			margin-top: -8rem;
+			text-align: center;
+		}
+	}
+
+}
+
+.back-home-container {
+	padding-top: 1rem;
+
+	.btn {
+		float: right;
+
+		i {
+			padding-right: 3px;
+		}
+
+	}
+
+}
+
+.back-home-container {
+	padding-top: 1rem;
+
+	.btn {
+		float: right;
+
+		i {
+			padding-right: 3px;
+		}
+
+	}
+
+}
+
+.my-account-edit {
+	max-width: 90%;
+	background: #fff;
+	border: 1px solid lighten($color-app-light-grey, 25%);
+	border-radius: $border-radius-lg;
+	margin: 8rem auto 0;
+	padding: 2rem;
+
+	@include media-breakpoint-up(md) {
+		width: 100%;
+		max-width: 600px;
+	}
+
+	.prop-header-actions {
+		display: none;
+	}
+
+	&.prop-wrapper .persistence-actions.bottom.actions {
+		text-align: right;
+	}
+
+	.prop > label {
+		margin-bottom: 0.125rem;
+	}
+
+	.prop-body {
+
+		.user-picture {
+			text-align: center;
+			max-width: none;
+			margin: -8rem auto 2rem;
+
+			> * {
+				margin: 0 auto;
+			}
+
+			> .actions.bottom {
+				margin: 1rem auto 0;
+			}
+
+			&.mode-view {
+				img {
+					border-radius: 100%;
+					width: 190px;
+					height: auto;
+				}
+			}
+
+		}
+
+		.prop {
+			input.val {
+				width: 100%;
+			}
+
+			.select2-container {
+				width: 100% !important;
+				max-width: none;
+			}
+		}
+
+	}
+
+}
+
+#oneall-providers-login, div.oneall {
+	max-width: 600px;
+	margin: 0 auto;
+}
+
+div.oneall {
+	padding: 1rem 0;
+}

@@ -1,0 +1,94 @@
+@import "../config/base-vars";
+@import "../../../../../node_modules/bootstrap/scss/mixins";
+@import "../mixins/bootstrap-legacy-buttons";
+
+.text-group {
+	padding: .5rem;
+
+	&.actions {
+		text-align: center;
+
+		.btn {
+			display: block;
+			margin-top: 1rem;
+			@include button-size-legacy($btn-padding-y-sm, $btn-padding-x-sm, $font-size-sm, $btn-size-line-height, $btn-border-radius-sm);
+
+			+ .btn {
+				margin-left: 0;
+			}
+		}
+	}
+
+	&.last-text-change-record {
+		flex: 1 100%;
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: space-between;
+		padding: 0;
+		margin-top: 1rem;
+		border: 1px solid $color-lighter-grey;
+
+		.prop {
+			padding-left: 1rem;
+			margin-bottom: 0;
+			font-size: .85rem;
+
+			&:last-of-type {
+				padding-right: 1rem;
+			}
+		}
+
+		.group-label {
+			flex: 1 100%;
+			font-size: 1rem;
+			font-weight: 500;
+			padding: .5rem 1rem;
+			background: $color-lighter-grey;
+		}
+	}
+
+	&.current-text, &.updated-text {
+		max-width: 50%;
+
+		@include media-breakpoint-up(lg) {
+			max-width: 35%;
+		}
+
+		label {
+			font-weight: 500;
+		}
+	}
+}
+
+.prop-editor {
+	background: transparent;
+	border: none;
+}
+
+.prop-body {
+	display: flex;
+	flex-wrap: wrap;
+	background-color: $color-white;
+	border: 1px solid $color-lighter-grey;
+	justify-content: flex-start;
+	align-items: flex-start;
+	padding: 1.5rem;
+
+	@include media-breakpoint-up(lg) {
+		justify-content: center;
+	}
+
+	.actions {
+		align-self: center;
+	}
+
+	.text-group textarea {
+		width: 100%;
+		//min-width: 380px;
+		resize: both;
+		&[readonly] {
+			border: 1px dotted $color-lighter-grey;
+			background-color: $color-lightest-grey;
+		}
+	}
+}

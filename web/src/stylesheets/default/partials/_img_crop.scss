@@ -1,0 +1,41 @@
+@import "../config/base-vars";
+@import "../../../../../node_modules/bootstrap/scss/mixins/buttons";
+@import "../../../../../node_modules/bootstrap/scss/buttons";
+@import "../mixins/bootstrap-legacy-buttons";
+
+input.custom-file {
+	width: 0.1px;
+	height: 0.1px;
+	opacity: 0;
+	overflow: hidden;
+	position: absolute;
+	z-index: -1;
+	&:focus + label {
+		outline: 1px dotted #000;
+		outline: -webkit-focus-ring-color auto 5px;
+	}
+}
+
+label.custom-file {
+	display: inline-block;
+	font-weight: $btn-font-weight;
+	line-height: $btn-line-height;
+	text-align: center;
+	white-space: nowrap;
+	vertical-align: middle;
+	user-select: none;
+	border: $input-btn-border-width solid transparent;
+	@include button-size-legacy($btn-padding-y, $btn-padding-x, $font-default-size, $btn-size-line-height, $btn-border-radius);
+	@include button-variant-legacy($color-app-brand, $color-white, $color-app-brand);
+	text-transform: uppercase;
+
+	cursor: pointer;
+
+	* {
+		pointer-events: none;
+	}
+}
+
+label.custom-file:hover {
+	@include box-shadow($btn-focus-box-shadow, $btn-active-box-shadow);
+}
