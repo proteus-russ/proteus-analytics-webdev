@@ -1,11 +1,14 @@
 (function (w) {
 
+	// FUTURE <russ!@proteus.co> : Add hit data queue and unload/onbeforeunload event listeners that send
+	//	pending queue elements via synchronous XMLHttpRequests.
+
 	const isString = val => typeof val === 'string';
 	const isBlob = val => val instanceof Blob;
 
-	polyfill(w);
+	beaconPolyfill(w);
 
-	function polyfill(w) {
+	function beaconPolyfill(w) {
 		if (('navigator' in w) && ('sendBeacon' in w.navigator)) return;
 		if (!('navigator' in w)) w.navigator = {};
 		w.navigator.sendBeacon = sendBeacon.bind(w);
@@ -66,17 +69,10 @@
 		sendBeacon(model.collector, blob);
 	}
 
-	class ProteusAnalytics {
-
-		constructor(name, collector) {
+	class Model {
+		constructor(collector) {
 			this.data = {};
-			this.name = name;
 			this.collector = collector;
-			TRACKERS.push(this);
-
-			this.set(BUILD_HIT_TASK, buildHitTask);
-			this.set(SEND_HIT_TASK, sendHitTask);
-			this.set("location", w.location.href);
 		}
 
 		get(key) {
@@ -91,6 +87,20 @@
 			} else {
 				this.data[key] = value;
 			}
+		}
+
+	}
+
+	class ProteusAnalytics extends Model {
+
+		constructor(name, collector) {
+			super(collector);
+			this.name = name;
+			TRACKERS.push(this);
+
+			this.set(BUILD_HIT_TASK, buildHitTask);
+			this.set(SEND_HIT_TASK, sendHitTask);
+			this.set("location", w.location.href);
 		}
 
 		send(...args) {
