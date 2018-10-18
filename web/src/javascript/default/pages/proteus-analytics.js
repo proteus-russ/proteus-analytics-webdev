@@ -1,4 +1,5 @@
-(function (w,d) {
+
+(function (w, d) {
 
 	// FUTURE <russ!@proteus.co> : Add hit data queue and unload/onbeforeunload event listeners that send
 	//	pending queue elements via synchronous XMLHttpRequests.
@@ -40,6 +41,13 @@
 		return true;
 	}
 
+	const HIT_TYPE_EVENT = Object.freeze([
+		'category',
+		'action',
+		'label',
+		'value'
+	]);
+
 	const BUILD_HIT_TASK = "buildHitTask";
 	const SEND_HIT_TASK = "sendHitTask";
 	const HIT_PAYLOAD = "hitPayload";
@@ -66,13 +74,13 @@
 		const stringified = JSON.stringify(payload);
 		console.log("sendHitTask", stringified);
 		const blob = new Blob([stringified], {type: 'text/plain'});
-		sendBeacon(model.collector, blob);
+		sendBeacon(model.endpoint, blob);
 	}
 
 	class Model {
-		constructor(collector) {
+		constructor(endpoint) {
 			this.data = {};
-			this.collector = collector;
+			this.endpoint = endpoint;
 		}
 
 		get(key) {
@@ -93,8 +101,8 @@
 
 	class ProteusAnalytics extends Model {
 
-		constructor(name, collector) {
-			super(collector);
+		constructor(name, endpoint) {
+			super(endpoint);
 			this.name = name;
 			TRACKERS.push(this);
 
@@ -103,8 +111,27 @@
 			this.set("location", w.location.href);
 			this.set("page", location.pathname);
 			const meta = d.querySelector('meta[http-equiv="X-Request-ID"]');
-			if(meta)
+			if (meta)
 				this.set("requestId", meta.getAttribute("content"));
+		}
+
+		handleEvent(...args) {
+			this.get(BUILD_HIT_TASK).call(this, this);
+			const hitPayload = this.get(HIT_PAYLOAD);
+			hitPayload[PAYLOAD_HIT_TYPE] = "event";
+			for (let i = 0; i < args.length; i++) {
+				let arg = args[i];
+				if (arg == null) continue;
+				if (typeof arg != "object") {
+					hitPayload[HIT_TYPE_EVENT[i]] = arg;
+				} else {
+					for (let key in arg) {
+						// noinspection JSUnfilteredForInLoop
+						hitPayload[key] = arg[key];
+					}
+				}
+			}
+			this.get(SEND_HIT_TASK).call(this, this);
 		}
 
 		send(...args) {
@@ -113,14 +140,7 @@
 			args = args.slice(1);
 			switch (hitType) {
 				case "event": {
-					this.get(BUILD_HIT_TASK).call(this, this);
-					const hitPayload = this.get(HIT_PAYLOAD);
-					hitPayload[PAYLOAD_HIT_TYPE] = hitType;
-					let eventData = args[0];
-					for (let key in eventData) {
-						hitPayload[key] = eventData[key];
-					}
-					this.get(SEND_HIT_TASK).call(this, this);
+					this.handleEvent(...args);
 					break;
 				}
 				default: {
