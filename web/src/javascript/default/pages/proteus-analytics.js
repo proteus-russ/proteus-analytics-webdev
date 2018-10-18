@@ -1,4 +1,4 @@
-(function (w) {
+(function (w,d) {
 
 	// FUTURE <russ!@proteus.co> : Add hit data queue and unload/onbeforeunload event listeners that send
 	//	pending queue elements via synchronous XMLHttpRequests.
@@ -101,6 +101,10 @@
 			this.set(BUILD_HIT_TASK, buildHitTask);
 			this.set(SEND_HIT_TASK, sendHitTask);
 			this.set("location", w.location.href);
+			this.set("page", location.pathname);
+			const meta = d.querySelector('meta[http-equiv="X-Request-ID"]');
+			if(meta)
+				this.set("requestId", meta.getAttribute("content"));
 		}
 
 		send(...args) {
@@ -193,4 +197,4 @@
 
 	w.pa = pa;
 
-})(window);
+})(window, document);
