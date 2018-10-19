@@ -1,4 +1,3 @@
-
 (function (w, d) {
 
 	// FUTURE <russ!@proteus.co> : Add hit data queue and unload/onbeforeunload event listeners that send
@@ -12,14 +11,14 @@
 	function beaconPolyfill(w) {
 		if (('navigator' in w) && ('sendBeacon' in w.navigator)) return;
 		if (!('navigator' in w)) w.navigator = {};
-		w.navigator.sendBeacon = sendBeacon.bind(w);
+		w.navigator.sendBeacon = sendBeaconPoly.bind(w);
 	}
 
-	function sendBeacon(url, data) {
-		const event = this.event && this.event.type;
+	function sendBeaconPoly(url, data) {
+		const event = w.event && w.event.type;
 		const sync = event === 'unload' || event === 'beforeunload';
 
-		const xhr = ('XMLHttpRequest' in this) ? new XMLHttpRequest() : new ActiveXObject('Microsoft.XMLHTTP');
+		const xhr = ('XMLHttpRequest' in w) ? new XMLHttpRequest() : new ActiveXObject('Microsoft.XMLHTTP');
 		xhr.open('POST', url, !sync);
 		xhr.withCredentials = true;
 		xhr.setRequestHeader('Accept', '*/*');
@@ -74,7 +73,7 @@
 		const stringified = JSON.stringify(payload);
 		console.log("sendHitTask", stringified);
 		const blob = new Blob([stringified], {type: 'text/plain'});
-		sendBeacon(model.endpoint, blob);
+		navigator.sendBeacon(model.endpoint, blob);
 	}
 
 	class Model {
@@ -118,7 +117,6 @@
 		handleEvent(...args) {
 			this.get(BUILD_HIT_TASK).call(this, this);
 			const hitPayload = this.get(HIT_PAYLOAD);
-			hitPayload[PAYLOAD_HIT_TYPE] = "event";
 			for (let i = 0; i < args.length; i++) {
 				let arg = args[i];
 				if (arg == null) continue;
@@ -131,6 +129,16 @@
 					}
 				}
 			}
+			for (let key in hitPayload) {
+				if(key.startsWith("event")) {
+					let value = hitPayload[key];
+					delete hitPayload[key];
+					let newKey = key.substring(5);
+					newKey = newKey[0].toLowerCase() + newKey.substring(1);
+					hitPayload[newKey] = value;
+				}
+			}
+			hitPayload[PAYLOAD_HIT_TYPE] = "event";
 			this.get(SEND_HIT_TASK).call(this, this);
 		}
 
