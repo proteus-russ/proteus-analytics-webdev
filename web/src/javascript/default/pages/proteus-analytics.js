@@ -3,6 +3,7 @@
 	// FUTURE <russ!@proteus.co> : Add hit data queue and unload/onbeforeunload event listeners that send
 	//	pending queue elements via synchronous XMLHttpRequests.
 
+	const DEBUG = false;
 	const isString = val => typeof val === 'string';
 	const isBlob = val => val instanceof Blob;
 
@@ -65,13 +66,13 @@
 			payload[key] = value;
 		}
 		model.set(HIT_PAYLOAD, payload);
-		console.log("buildHitTask", payload);
+		if (DEBUG) console.log("buildHitTask", payload);
 	}
 
 	function sendHitTask(model) {
 		const payload = model.get(HIT_PAYLOAD);
 		const stringified = JSON.stringify(payload);
-		console.log("sendHitTask", stringified);
+		if (DEBUG) console.log("sendHitTask", stringified);
 		const blob = new Blob([stringified], {type: 'text/plain'});
 		navigator.sendBeacon(model.endpoint, blob);
 	}
@@ -83,12 +84,12 @@
 		}
 
 		get(key) {
-			console.log("get", key);
+			if (DEBUG) console.log("get", key);
 			return this.data[key];
 		}
 
 		set(key, value) {
-			console.log("set", key, value);
+			if (DEBUG) console.log("set", key, value);
 			if (typeof key == "object" && key != null && value == null) {
 				Object.assign(this.data, key);
 			} else {
@@ -143,7 +144,7 @@
 		}
 
 		send(...args) {
-			console.log("send", args);
+			if (DEBUG) console.log("send", args);
 			let hitType = args[0];
 			args = args.slice(1);
 			switch (hitType) {
@@ -158,7 +159,7 @@
 		}
 
 		require(pluginName, opts) {
-			console.log("require", pluginName, opts);
+			if (DEBUG) console.log("require", pluginName, opts);
 			new PLUGINS[pluginName](this, opts);
 		}
 
@@ -177,12 +178,12 @@
 
 		static remove(name) {
 			// not implemented
-			console.log("remove", name);
+			if (DEBUG) console.log("remove", name);
 		}
 
 		static provide(pluginName, pluginConstructor) {
 			this.checkIfInUse(pluginName);
-			console.log("provide", pluginName, pluginConstructor);
+			if (DEBUG) console.log("provide", pluginName, pluginConstructor);
 			PLUGINS[pluginName] = pluginConstructor;
 		}
 
@@ -195,7 +196,7 @@
 	}
 
 	function pa(...args) {
-		console.log("pa", args);
+		if (DEBUG) console.log("pa", args);
 		let command = args[0];
 		if (command.indexOf(":") != -1)
 			throw new Error("Do not currently support named trackers / plugins");
