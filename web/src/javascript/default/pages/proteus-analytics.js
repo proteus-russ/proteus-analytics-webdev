@@ -1,3 +1,11 @@
+if (!Array.prototype.flatMap) {
+  Array.prototype.flatMap = function(fun) {
+    return this.reduce(function(acc, val) {
+      return fun(val);
+    }, []);
+  }
+}
+
 (function (w, d) {
 
 	// FUTURE <russ!@proteus.co> : Add hit data queue and unload/onbeforeunload event listeners that send
@@ -99,6 +107,22 @@
 
 	}
 
+	class Tuple {
+		constructor(one, two) {
+			if (PA_DEBUG) console.log(`Building Tuple: [${JSON.stringify(one)}, ${JSON.stringify(typeof two === 'function' ? 'function' : two)}]`)
+			Object.defineProperties(this, {
+				one: {
+					value: one,
+					writable: false
+				},
+				two: {
+					value: two,
+					writable: false
+				}
+			});
+		}
+	}
+
 	class ProteusAnalytics extends Model {
 
 		constructor(name, endpoint) {
@@ -111,12 +135,23 @@
 			this.set("location", w.location.href);
 			this.set("page", location.pathname);
 			const meta = d.querySelector('meta[http-equiv="X-Request-ID"]');
-			if (meta)
+			if (meta) {
 				this.set("requestId", meta.getAttribute("content"));
+			}
+		}
+
+		getFromArgs(propName, args) {
+			if (PA_DEBUG) console.log(`getFromArgs ${propName} ${JSON.stringify(args)}`);
+			let fromArgs = args
+								.filter(arg => typeof arg === 'object' && arg != null)
+								.flatMap(arg => Object.keys(arg).map(key => new Tuple(key, arg[key])))
+								.filter(t => t.one === propName)
+								.map(t => t.two)[0];
+			return fromArgs != null ? fromArgs : this.get(propName);
 		}
 
 		handleEvent(...args) {
-			this.get(BUILD_HIT_TASK).call(this, this);
+			this.getFromArgs(BUILD_HIT_TASK, args).call(this, this);
 			const hitPayload = this.get(HIT_PAYLOAD);
 			for (let i = 0; i < args.length; i++) {
 				let arg = args[i];
@@ -131,7 +166,7 @@
 				}
 			}
 			for (let key in hitPayload) {
-				if(key.startsWith("event")) {
+				if (key.startsWith("event")) {
 					let value = hitPayload[key];
 					delete hitPayload[key];
 					let newKey = key.substring(5);
