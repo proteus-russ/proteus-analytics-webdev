@@ -1,9 +1,9 @@
 if (!Array.prototype.flatMap) {
-  Array.prototype.flatMap = function(fun) {
-    return this.reduce(function(acc, val) {
-      return fun(val);
-    }, []);
-  }
+	Array.prototype.flatMap = function(fun) {
+		return this.reduce(function(acc, val) {
+			return fun(val);
+		}, []);
+	}
 }
 
 (function (w, d) {
@@ -63,8 +63,16 @@ if (!Array.prototype.flatMap) {
 	const TRACKERS = [];
 	const PLUGINS = {};
 
+	function getOrDefault(model, propName, defaultVal) {
+		let result = model.get(propName);
+		if (result == null) {
+			result = defaultVal;
+		}
+		return result;
+	}
+
 	function buildHitTask(model) {
-		let payload = {};
+		let payload = getOrDefault(model, HIT_PAYLOAD, {});
 		for (let key in model.data) {
 			let value = model.data[key];
 			if (value == null || typeof value == "function" || typeof value == "object" || typeof value == "undefined"
@@ -96,12 +104,26 @@ if (!Array.prototype.flatMap) {
 			return this.data[key];
 		}
 
-		set(key, value) {
-			if (PA_DEBUG) console.log("set", key, value);
-			if (typeof key == "object" && key != null && value == null) {
-				Object.assign(this.data, key);
+		__getData__(temporary) {
+			if (temporary) {
+				let payload = this.get(HIT_PAYLOAD);
+				if (payload == null) {
+					payload = {};
+					this.data[HIT_PAYLOAD] = payload;
+				}
+				return payload;
 			} else {
-				this.data[key] = value;
+				return this.data;
+			}
+		}
+
+		set(key, value, temporary) {
+			if (PA_DEBUG) console.log("set", key, value);
+			let dat = this.__getData__(temporary);
+			if (typeof key === "object" && key != null && value == null) {
+				Object.assign(dat, key);
+			} else {
+				dat[key] = value;
 			}
 		}
 
@@ -143,10 +165,10 @@ if (!Array.prototype.flatMap) {
 		getFromArgs(propName, args) {
 			if (PA_DEBUG) console.log(`getFromArgs ${propName} ${JSON.stringify(args)}`);
 			let fromArgs = args
-								.filter(arg => typeof arg === 'object' && arg != null)
-								.flatMap(arg => Object.keys(arg).map(key => new Tuple(key, arg[key])))
-								.filter(t => t.one === propName)
-								.map(t => t.two)[0];
+					.filter(arg => typeof arg === 'object' && arg != null)
+					.flatMap(arg => Object.keys(arg).map(key => new Tuple(key, arg[key])))
+					.filter(t => t.one === propName)
+					.map(t => t.two)[0];
 			return fromArgs != null ? fromArgs : this.get(propName);
 		}
 
