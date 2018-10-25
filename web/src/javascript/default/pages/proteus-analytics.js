@@ -11,7 +11,7 @@ if (!Array.prototype.flatMap) {
 	// FUTURE <russ!@proteus.co> : Add hit data queue and unload/onbeforeunload event listeners that send
 	//	pending queue elements via synchronous XMLHttpRequests.
 
-	w.PA_DEBUG = true;
+	w.PA_DEBUG = false;
 	const isString = val => typeof val === 'string';
 	const isBlob = val => val instanceof Blob;
 
