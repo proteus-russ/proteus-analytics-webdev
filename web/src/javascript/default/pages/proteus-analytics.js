@@ -1,6 +1,6 @@
 if (!Array.prototype.flatMap) {
-	Array.prototype.flatMap = function(fun) {
-		return this.reduce(function(acc, val) {
+	Array.prototype.flatMap = function (fun) {
+		return this.reduce(function (acc, val) {
 			return fun(val);
 		}, []);
 	}
@@ -86,11 +86,25 @@ if (!Array.prototype.flatMap) {
 	}
 
 	function sendHitTask(model) {
-		const payload = model.get(HIT_PAYLOAD);
+		const payload = ensurePageVariablesSet(model, model.get(HIT_PAYLOAD));
 		const stringified = JSON.stringify(payload);
+		model.set(HIT_PAYLOAD, {}); // Clear the hit payload so the next hit starts with a blank slate.
 		if (PA_DEBUG) console.log("sendHitTask", stringified);
 		const blob = new Blob([stringified], {type: 'text/plain'});
 		navigator.sendBeacon(model.endpoint, blob);
+	}
+
+
+	function ensurePageVariablesSet(model, payload) {
+		if (!model.get("page") && !payload["page"]) {
+			payload["page"] = location.pathname.replace(/^(.*?);jsessionid=[.0-9a-zA-Z]*/, '$1')
+					.replace(/^(.*?)FdxbQVI.*/, '$1');
+		}
+		if (!model.get("location") && !payload["location"]) {
+			payload["location"] = location.href.replace(/^(.*?);jsessionid=[.0-9a-zA-Z]*/, '$1')
+					.replace(/^(.*?)FdxbQVI.*/, '$1');
+		}
+		return payload;
 	}
 
 	class Model {
@@ -154,8 +168,7 @@ if (!Array.prototype.flatMap) {
 
 			this.set(BUILD_HIT_TASK, buildHitTask);
 			this.set(SEND_HIT_TASK, sendHitTask);
-			this.set("location", w.location.href);
-			this.set("page", location.pathname);
+			this.set("pageTitle", document.title);
 			const meta = d.querySelector('meta[http-equiv="X-Request-ID"]');
 			if (meta) {
 				this.set("requestId", meta.getAttribute("content"));
@@ -245,10 +258,12 @@ if (!Array.prototype.flatMap) {
 		}
 
 		static checkIfInUse(name) {
-			if (this.getByName(name))
+			if (this.getByName(name)) {
 				throw new Error("Name in use by tracker: " + name);
-			if (name in PLUGINS)
+			}
+			if (name in PLUGINS) {
 				throw new Error("Name in use by plugin: " + name);
+			}
 		}
 	}
 
@@ -263,17 +278,19 @@ if (!Array.prototype.flatMap) {
 			owner = ProteusAnalytics;
 			fun = ProteusAnalytics[command];
 		} else {
-			owner = TRACKERS[0]; //ProteusAnalytics.getByName(name);
-			if (owner != null)
+			owner = TRACKERS[0]; // ProteusAnalytics.getByName(name);
+			if (owner != null) {
 				fun = owner[command];
+			}
 		}
 		if (fun != null) {
 			return fun.apply(owner, args.slice(1));
 		} else {
-			if (owner != null)
+			if (owner != null) {
 				console.error("Unable to find function.", args);
-			else
+			} else {
 				console.error("Unable to find owner.", args);
+			}
 		}
 	}
 
